@@ -1,0 +1,30 @@
+{
+  "config_version": 1,
+  "visibility": {
+    "current": true,
+    "next": true,
+    "vip": true,
+    "history": true,
+    "status": true,
+    "scratch_entry": true
+  },
+  "styles": {
+    "draw_numbers": {
+      "shape": "circle",
+      "fill": "#2B6ED1",
+      "text": "#FFFFFF",
+      "size": 74,
+      "gap": 11
+    },
+    "scratch_dialog": {
+      "width": 480,
+      "height": 320,
+      "background": "#FFFFFF",
+      "overlay_alpha": 120,
+      "scratch_fill": "#DCE9FB",
+      "radius": 8,
+      "title_size": 18,
+      "button_style": "primary"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "config_version": 1,
+  "navigation": {
+    "width": 216,
+    "item_height": 40,
+    "item_gap": 4,
+    "items": [
+      {"id": "home", "label": "首页", "icon": "⌂", "visible": true},
+      {"id": "data", "label": "数据中心", "icon": "▤", "visible": true},
+      {"id": "vip", "label": "VIP100", "icon": "◇", "visible": true},
+      {"id": "strategy", "label": "策略研究", "icon": "⌁", "visible": true},
+      {"id": "gap", "label": "遗漏分析", "icon": "◌", "visible": true},
+      {"id": "trend", "label": "走势图", "icon": "⌁", "visible": true},
+      {"id": "train", "label": "火车路子", "icon": "▥", "visible": true},
+      {"id": "settings", "label": "设置", "icon": "⚙", "visible": true}
+    ]
+  },
+  "home": {
+    "order": ["current", "next", "vip", "history", "status"],
+    "columns": 3,
+    "components": {
+      "current": {"x": 24, "y": 24, "width": 540, "height": 260, "min_width": 360, "min_height": 180},
+      "next": {"x": 580, "y": 24, "width": 260, "height": 260, "min_width": 220, "min_height": 180},
+      "vip": {"x": 856, "y": 24, "width": 300, "height": 260, "min_width": 240, "min_height": 180},
+      "history": {"x": 24, "y": 300, "width": 1132, "height": 360, "min_width": 560, "min_height": 220},
+      "status": {"x": 24, "y": 672, "width": 1132, "height": 32, "min_width": 480, "min_height": 24}
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "config_version": 1,
+  "colors": {
+    "app_background": "#EDF2F7",
+    "content_background": "#F7F9FC",
+    "card_background": "#FFFFFF",
+    "primary": "#2B6ED1",
+    "secondary": "#5D83BF",
+    "border": "#D7E0EA",
+    "success": "#2AA874",
+    "warning": "#C68A32",
+    "error": "#C64A57",
+    "text": "#142238",
+    "muted_text": "#78879A"
+  },
+  "font": {
+    "family": "Microsoft YaHei",
+    "base_size": 13,
+    "title_size": 17,
+    "body_size": 13,
+    "table_size": 12,
+    "number_size": 32,
+    "weight": 400
+  },
+  "sizes": {
+    "nav_width": 216,
+    "topbar_height": 46,
+    "card_height": 260,
+    "table_row_height": 32,
+    "button_height": 30,
+    "icon_size": 16,
+    "draw_number_size": 74,
+    "countdown_size": 45
+  },
+  "style": {
+    "radius": 6,
+    "border_width": 1,
+    "shadow_enabled": false,
+    "shadow_strength": 12,
+    "padding": 16,
+    "margin": 12,
+    "gap": 13
+  }
+}
