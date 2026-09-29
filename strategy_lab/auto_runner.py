@@ -142,6 +142,9 @@ class StrategyAutoRunner:
             }
             if self.config.include_v21:
                 experiments.update(self._run_v21(records))
+            v21_status = experiments.get("v2.1", {}).get("status")
+            if v21_status and v21_status != "PASS":
+                warnings = tuple(warnings) + (f"v2.1 状态：{v21_status}",)
 
             self._log("STEP strategy_compare START")
             frozen_status = tuple(self._compare_frozen(rankings))
@@ -399,6 +402,10 @@ class StrategyAutoRunner:
         warning_rows = "".join(
             f"<li>{cell(item)}</li>" for item in payload.get("warnings", [])
         ) or "<li>无</li>"
+        experiments = payload.get("experiments", {})
+        v21 = experiments.get("v2.1", {}) if isinstance(experiments, Mapping) else {}
+        v21_status = cell(v21.get("status", "未执行"))
+        v21_snapshot = cell(v21.get("snapshot_id", ""))
         status = payload.get("data_status", {})
         return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><title>无忧28 策略实验日报</title>
@@ -411,6 +418,7 @@ th{{background:#eff6ff}}.summary{{display:flex;gap:24px;margin:16px 0}}</style><
 <span>FAIL：{cell(payload.get('fail_count'))}</span></div>
 <h2>候选策略</h2><table><thead><tr><th>排名</th><th>策略</th><th>触发次数</th>
 <th>验证命中率</th><th>最大连错</th><th>状态</th></tr></thead><tbody>{top_rows}</tbody></table>
+<h2>稳定性实验 v2.1</h2><p>状态：{v21_status}　Snapshot：{v21_snapshot}</p>
 <h2>警告</h2><ul>{warning_rows}</ul></body></html>"""
 
     def _log(self, message: str) -> None:
