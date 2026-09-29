@@ -95,7 +95,7 @@ class _SearchWorker(QObject):
 
 
 class StrategyExperimentPage(QWidget):
-    """Strategy Lab v1.2 page backed by the isolated lab package."""
+    """Strategy Lab v2.1 page backed by the isolated lab package."""
 
     data_changed = Signal()
 

@@ -204,7 +204,11 @@ class StrategyAutoRunner:
                 "top_strategies": [],
                 "frozen_strategy_status": [],
                 "warnings": [message],
-                "experiments": {"v1": {"status": "FAIL"}},
+                "experiments": {
+                    "v1": {"status": "FAIL"},
+                    "v2": {"status": "FAIL"},
+                    "v2.1": {"status": "FAIL"},
+                },
             }
             report_json = ""
             report_html = ""
