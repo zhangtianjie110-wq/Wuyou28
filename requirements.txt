@@ -1,0 +1,5 @@
+# QtCore / QtGui / QtWidgets 已足够，避免安装本项目不使用的多媒体等大型 Addons。
+PySide6-Essentials>=6.7,<7
+openpyxl>=3.1,<4
+pyinstaller>=6.8,<7
+# UI Automation 与 OCR 使用 Windows 自带组件，不引入额外自动化/模型运行库。

@@ -106,7 +106,7 @@ class HistoryPage(QWidget):
         self.table.setAlternatingRowColors(True)
         self.table.setWordWrap(False)
         self.table.verticalHeader().setVisible(False)
-        self.table.verticalHeader().setDefaultSectionSize(30)
+        self.table.verticalHeader().setDefaultSectionSize(44)
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Interactive)
         for column, width in enumerate((105, 62, 62, 62, 62, 62, 78, 62, 62, 115, 62)):

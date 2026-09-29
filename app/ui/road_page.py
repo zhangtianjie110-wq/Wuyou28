@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Iterable
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QComboBox,
@@ -13,10 +14,12 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
+    QSizePolicy,
 )
 
 from ..integration import IntegrationGateway
 from .trend_page import TrendRow, build_trend_rows
+from .widgets import PageHeader, StatCard, polish_table
 
 
 @dataclass(frozen=True)
@@ -99,21 +102,35 @@ class RoadPage(QWidget):
         self._tables: dict[str, QTableWidget] = {}
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(20, 20, 20, 20)
-        root.setSpacing(10)
+        root.setContentsMargins(16, 6, 16, 8)
+        root.setSpacing(5)
+
+        # Keep the page header deliberately compact.  The range/status toolbar
+        # belongs above the data tables so the three status cards stay directly
+        # below the title.
+        root.addWidget(PageHeader("长龙统计"))
+
+        status_row = QHBoxLayout()
+        status_row.setSpacing(8)
+        self.current_streak_card = StatCard("当前长龙", "—", compact=True)
+        self.max_streak_card = StatCard("历史最大长龙", "—", compact=True)
+        self.current_state_card = StatCard("当前状态", "—", compact=True)
+        for card in (self.current_streak_card, self.max_streak_card, self.current_state_card):
+            card.setFixedHeight(96)
+            status_row.addWidget(card, 1)
+        root.addLayout(status_row)
 
         heading = QHBoxLayout()
-        title = QLabel("火车 / 路子")
-        title.setObjectName("PageTitle")
-        heading.addWidget(title)
-        heading.addStretch()
+        heading.setSpacing(6)
         heading.addWidget(QLabel("最近"))
         self.range_box = QComboBox()
         self.range_box.addItems([str(value) for value in self.RANGES])
         self.range_box.currentTextChanged.connect(self.refresh)
         heading.addWidget(self.range_box)
         self.status_label = QLabel("—")
+        self.status_label.setObjectName("Muted")
         heading.addWidget(self.status_label)
+        heading.addStretch()
         root.addLayout(heading)
 
         self.summary_table = QTableWidget(0, 4)
@@ -121,12 +138,15 @@ class RoadPage(QWidget):
         self.summary_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.summary_table.setSortingEnabled(False)
         self.summary_table.setAlternatingRowColors(True)
+        self.summary_table.verticalHeader().setVisible(False)
+        polish_table(self.summary_table, 108)
+        self.summary_table.verticalHeader().setDefaultSectionSize(36)
         root.addWidget(self.summary_table)
 
         self.road_layout = QGridLayout()
         self.road_layout.setHorizontalSpacing(12)
-        self.road_layout.setVerticalSpacing(8)
-        root.addLayout(self.road_layout)
+        self.road_layout.setVerticalSpacing(4)
+        root.addLayout(self.road_layout, 1)
         self.refresh()
 
     def refresh(self) -> None:
@@ -151,6 +171,10 @@ class RoadPage(QWidget):
         for row_index, (title, attribute, directions) in enumerate(self.ROAD_DEFINITIONS):
             stats = road_stats(self.rows, attribute)
             self.stats[attribute] = stats
+            if row_index == 0:
+                self.current_streak_card.set_value(str(stats["current_streak"]))
+                self.max_streak_card.set_value(str(stats["max_streak"]))
+                self.current_state_card.set_value(stats["current_direction"] or "暂无数据")
             values = (
                 title,
                 stats["current_direction"] or ("DATA_GAP" if self.rows and self.rows[-1].data_gap else "—"),
@@ -158,11 +182,14 @@ class RoadPage(QWidget):
                 str(stats["max_streak"]),
             )
             for column, value in enumerate(values):
-                self.summary_table.setItem(row_index, column, QTableWidgetItem(value))
+                item = QTableWidgetItem(value)
+                item.setTextAlignment(Qt.AlignCenter)
+                self.summary_table.setItem(row_index, column, item)
             table = self._make_road_table(stats["segments"], directions)
             self._tables[attribute] = table
             self.road_layout.addWidget(QLabel(title), row_index, 0)
             self.road_layout.addWidget(table, row_index, 1)
+            self.road_layout.setRowStretch(row_index, 1)
 
     @staticmethod
     def _make_road_table(segments: tuple[RoadSegment, ...], directions: tuple[str, ...]) -> QTableWidget:
@@ -171,17 +198,24 @@ class RoadPage(QWidget):
         table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         table.setSortingEnabled(False)
         table.setAlternatingRowColors(True)
-        table.setMinimumHeight(72)
+        table.verticalHeader().setVisible(False)
+        table.setMinimumHeight(64)
         table.setHorizontalHeaderLabels([str(index + 1) for index in range(max(1, len(segments)))])
+        polish_table(table, 120)
+        table.verticalHeader().setDefaultSectionSize(36)
+        table.setMaximumHeight(16777215)
+        table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         for column, segment in enumerate(segments):
             if segment.data_gap:
                 item = QTableWidgetItem("DATA_GAP")
+                item.setTextAlignment(Qt.AlignCenter)
                 item.setForeground(QColor("#B43B3B"))
                 item.setToolTip(f"缺口期号：{', '.join(segment.issues)}")
                 table.setItem(0, column, item)
                 continue
             for row, issue in enumerate(segment.issues):
                 item = QTableWidgetItem(segment.direction)
+                item.setTextAlignment(Qt.AlignCenter)
                 item.setToolTip(f"期号：{issue}")
                 table.setItem(row, column, item)
         return table

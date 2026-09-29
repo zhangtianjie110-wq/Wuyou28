@@ -15,22 +15,22 @@
   },
   "font": {
     "family": "Microsoft YaHei",
-    "base_size": 13,
-    "title_size": 17,
-    "body_size": 13,
-    "table_size": 12,
-    "number_size": 32,
+    "base_size": 14,
+    "title_size": 22,
+    "body_size": 14,
+    "table_size": 14,
+    "number_size": 18,
     "weight": 400
   },
   "sizes": {
-    "nav_width": 216,
+    "nav_width": 209,
     "topbar_height": 46,
     "card_height": 260,
-    "table_row_height": 32,
-    "button_height": 30,
+    "table_row_height": 40,
+    "button_height": 34,
     "icon_size": 16,
-    "draw_number_size": 74,
-    "countdown_size": 45
+    "draw_number_size": 32,
+    "countdown_size": 32
   },
   "style": {
     "radius": 6,

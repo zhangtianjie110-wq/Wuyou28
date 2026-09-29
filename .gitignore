@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Runtime data
+data/
+runtime_data/
+
+# Logs
+logs/
+*.log
+
+# Reports
+reports/
+outputs/
+# Build
+build/
+build_*/
+dist/
+dist_*/
+
+# Backup
+backups/
+backup/
+*_backup*/
+
+# Temporary
+tmp/
+temp/
+
+# Old versions
+_old_versions_quarantine/
+.le28_restore/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+# Local restore
+.le28_restore/
+
+# Virtual env
+.venv/
+
+# Release files
+release_output/
+exports/
+installer/
+
+# Debug builds
+*_debug.spec
+乐28预测分析.specdebug_*.txt
+debug_*.txt
+乐28预测分析.spec

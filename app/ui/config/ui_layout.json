@@ -11,7 +11,7 @@
       {"id": "strategy", "label": "策略研究", "icon": "⌁", "visible": true},
       {"id": "gap", "label": "遗漏分析", "icon": "◌", "visible": true},
       {"id": "trend", "label": "走势图", "icon": "⌁", "visible": true},
-      {"id": "train", "label": "火车路子", "icon": "▥", "visible": true},
+      {"id": "train", "label": "火车路子", "icon": "▥", "visible": false},
       {"id": "settings", "label": "设置", "icon": "⚙", "visible": true}
     ]
   },

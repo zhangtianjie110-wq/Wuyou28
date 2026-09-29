@@ -124,7 +124,7 @@ class InterfaceSettingsPage(QWidget):
         self.fields[('font', 'family')] = font
         form.addRow('字体', font)
         for section, key, label, low, high in (
-            ('font', 'base_size', '字号', 10, 24), ('font', 'title_size', '标题字号', 12, 32),
+            ('font', 'base_size', '字号', 14, 24), ('font', 'title_size', '标题字号', 18, 32),
             ('sizes', 'nav_width', '导航宽度', 168, 320),
             ('sizes', 'table_row_height', '表格行高', 24, 64),
             ('sizes', 'draw_number_size', '开奖号码大小', 44, 120),
@@ -140,8 +140,8 @@ class InterfaceSettingsPage(QWidget):
             ('编辑界面', self.enter_edit_mode), ('保存布局', self.save_layout),
             ('恢复默认布局', self.restore_layout)))
         self._action_group(body, '配置', (
-            ('导入UI配置', self.import_config), ('导出UI配置', self.export_config),
-            ('恢复默认UI', self.reset_config)))
+            ('导入界面配置', self.import_config), ('导出界面配置', self.export_config),
+            ('恢复默认界面', self.reset_config)))
         self.notice = QLabel('外观即时生效并保存；编辑界面后可调整首页组件。')
         self.notice.setWordWrap(True)
         body.addWidget(self.notice)
@@ -171,6 +171,8 @@ class InterfaceSettingsPage(QWidget):
         layout.addWidget(group)
 
     def bind_home(self, home):
+        if self.editor is not None:
+            return self.editor
         self.home = home
         self.editor = home.attach_layout_editor(self.model)
         self.editor.on_selected = self._select_component
@@ -198,9 +200,14 @@ class InterfaceSettingsPage(QWidget):
             shortcut.setContext(Qt.WidgetWithChildrenShortcut)
             shortcut.activated.connect(lambda c=component: self.editor.select_component(c))
             component.header.setToolTip(f'选择组件 Alt+{index}；拖动标题移动，边框手柄缩放')
+        return self.editor
+
+    def set_home(self, home):
+        """Remember the home page without attaching the optional editor."""
+        self.home = home
 
     def _property_panel(self):
-        panel = QGroupBox('属性面板 / Property Panel')
+        panel = QGroupBox('属性面板')
         self.property_panel = panel
         panel.setFixedWidth(238)
         root = QVBoxLayout(panel)
@@ -208,7 +215,7 @@ class InterfaceSettingsPage(QWidget):
         self.property_hint.setWordWrap(True)
         root.addWidget(self.property_hint)
         form = QFormLayout()
-        for key, label in (('x', 'X'), ('y', 'Y'), ('width', '宽度'), ('height', '高度')):
+        for key, label in (('x', '横坐标'), ('y', '纵坐标'), ('width', '宽度'), ('height', '高度')):
             field = QSpinBox()
             field.setRange(0, 4000 if key != 'height' else 2400)
             field.setSingleStep(8)
@@ -244,7 +251,9 @@ class InterfaceSettingsPage(QWidget):
 
     def enter_edit_mode(self):
         if self.editor is None:
-            return
+            if not hasattr(self, 'home'):
+                return
+            self.bind_home(self.home)
         self.editor.set_edit_mode(True)
         self.home.edit_toolbar.show()
         self.property_panel.show()
@@ -263,7 +272,19 @@ class InterfaceSettingsPage(QWidget):
         cid = self.model.selected_id
         if not hasattr(self, 'property_hint'):
             return
-        self.property_hint.setText(f'当前组件：{cid} · 8px 网格吸附' if cid else '选择组件标题以拖动；边框手柄调整大小。')
+        component_names = {
+            'current': '当前开奖',
+            'next': '下一期开奖',
+            'vip': 'VIP100 / 分析摘要',
+            'history': '最近开奖',
+            'status': '数据状态',
+        }
+        name = component_names.get(cid, cid)
+        self.property_hint.setText(
+            f'当前组件：{name} · 8 像素网格吸附'
+            if cid
+            else '选择组件标题以拖动；边框手柄调整大小。'
+        )
         for key, field in self.geometry_fields.items():
             field.blockSignals(True)
             field.setEnabled(bool(cid) and self.model.edit_mode)
@@ -336,7 +357,7 @@ class InterfaceSettingsPage(QWidget):
             field.blockSignals(False)
 
     def export_config(self):
-        path, _ = QFileDialog.getSaveFileName(self, '导出UI配置', 'wuyou28_ui.json', 'JSON (*.json)')
+        path, _ = QFileDialog.getSaveFileName(self, '导出界面配置', 'wuyou28_ui.json', 'JSON (*.json)')
         if path:
             self.config.export_bundle(path)
 
@@ -356,7 +377,7 @@ class InterfaceSettingsPage(QWidget):
         self.theme_changed.emit()
 
     def import_config(self):
-        path, _ = QFileDialog.getOpenFileName(self, '导入UI配置', '', 'JSON (*.json)')
+        path, _ = QFileDialog.getOpenFileName(self, '导入界面配置', '', 'JSON (*.json)')
         if path:
             try:
                 self.load_bundle(path)

@@ -36,22 +36,22 @@ DEFAULT_THEME: dict[str, Any] = {
     },
     "font": {
         "family": "Microsoft YaHei",
-        "base_size": 13,
-        "title_size": 17,
-        "body_size": 13,
-        "table_size": 12,
-        "number_size": 32,
+        "base_size": 14,
+        "title_size": 22,
+        "body_size": 14,
+        "table_size": 14,
+        "number_size": 18,
         "weight": 400,
     },
     "sizes": {
         "nav_width": 216,
         "topbar_height": 46,
         "card_height": 260,
-        "table_row_height": 32,
-        "button_height": 30,
+        "table_row_height": 40,
+        "button_height": 34,
         "icon_size": 16,
-        "draw_number_size": 74,
-        "countdown_size": 45,
+        "draw_number_size": 32,
+        "countdown_size": 32,
     },
     "style": {
         "radius": 6,
@@ -85,7 +85,7 @@ DEFAULT_LAYOUT: dict[str, Any] = {
             {"id": "strategy", "label": "策略研究", "icon": "⌁", "visible": True},
             {"id": "gap", "label": "遗漏分析", "icon": "◌", "visible": True},
             {"id": "trend", "label": "走势图", "icon": "⌁", "visible": True},
-            {"id": "train", "label": "火车路子", "icon": "▥", "visible": True},
+            {"id": "train", "label": "火车路子", "icon": "▥", "visible": False},
             {"id": "settings", "label": "设置", "icon": "⚙", "visible": True},
         ],
     },
@@ -152,17 +152,17 @@ def _sanitize_theme(theme: dict[str, Any]) -> dict[str, Any]:
     merged = _deep_merge(DEFAULT_THEME, theme)
     for key, fallback in DEFAULT_THEME["colors"].items():
         merged["colors"][key] = _hex(merged["colors"].get(key), fallback)
-    merged["font"]["base_size"] = _clamp_int(merged["font"].get("base_size"), 10, 24, 13)
-    merged["font"]["title_size"] = _clamp_int(merged["font"].get("title_size"), 12, 32, 17)
-    merged["font"]["body_size"] = _clamp_int(merged["font"].get("body_size"), 10, 24, 13)
-    merged["font"]["table_size"] = _clamp_int(merged["font"].get("table_size"), 10, 20, 12)
-    merged["font"]["number_size"] = _clamp_int(merged["font"].get("number_size"), 16, 96, 32)
+    merged["font"]["base_size"] = _clamp_int(merged["font"].get("base_size"), 14, 24, 14)
+    merged["font"]["title_size"] = _clamp_int(merged["font"].get("title_size"), 18, 32, 22)
+    merged["font"]["body_size"] = _clamp_int(merged["font"].get("body_size"), 14, 24, 14)
+    merged["font"]["table_size"] = _clamp_int(merged["font"].get("table_size"), 14, 20, 14)
+    merged["font"]["number_size"] = _clamp_int(merged["font"].get("number_size"), 18, 96, 18)
     merged["sizes"]["nav_width"] = _clamp_int(merged["sizes"].get("nav_width"), 168, 320, 216)
     merged["sizes"]["topbar_height"] = _clamp_int(merged["sizes"].get("topbar_height"), 34, 80, 46)
     merged["sizes"]["card_height"] = _clamp_int(merged["sizes"].get("card_height"), 160, 480, 260)
-    merged["sizes"]["table_row_height"] = _clamp_int(merged["sizes"].get("table_row_height"), 24, 64, 32)
-    merged["sizes"]["button_height"] = _clamp_int(merged["sizes"].get("button_height"), 24, 52, 30)
-    merged["sizes"]["draw_number_size"] = _clamp_int(merged["sizes"].get("draw_number_size"), 44, 120, 74)
+    merged["sizes"]["table_row_height"] = _clamp_int(merged["sizes"].get("table_row_height"), 40, 64, 40)
+    merged["sizes"]["button_height"] = _clamp_int(merged["sizes"].get("button_height"), 34, 52, 34)
+    merged["sizes"]["draw_number_size"] = _clamp_int(merged["sizes"].get("draw_number_size"), 32, 64, 32)
     merged["sizes"]["countdown_size"] = _clamp_int(merged["sizes"].get("countdown_size"), 24, 80, 45)
     merged["style"]["radius"] = _clamp_int(merged["style"].get("radius"), 0, 18, 6)
     merged["style"]["padding"] = _clamp_int(merged["style"].get("padding"), 4, 36, 16)
@@ -217,7 +217,7 @@ def _sanitize_components(components: dict[str, Any]) -> dict[str, Any]:
     draw["shape"] = draw.get("shape", "circle") if draw.get("shape") in {"circle", "rounded", "square"} else "circle"
     draw["fill"] = _hex(draw.get("fill"), "#2B6ED1")
     draw["text"] = _hex(draw.get("text"), "#FFFFFF")
-    draw["size"] = _clamp_int(draw.get("size"), 44, 120, 74)
+    draw["size"] = _clamp_int(draw.get("size"), 32, 64, 32)
     draw["gap"] = _clamp_int(draw.get("gap"), 4, 32, 11)
     return merged
 
@@ -819,7 +819,7 @@ if QT_AVAILABLE:
             font_box.setCurrentFont(QFont(self.config.theme.data["font"]["family"]))
             font_box.currentFontChanged.connect(lambda font: self._update_font("family", font.family()))
             form.addRow("字体", font_box)
-            for key, label, low, high in [("base_size", "全局字号", 10, 24), ("title_size", "标题字号", 12, 32), ("table_size", "表格字号", 10, 20), ("number_size", "数字字号", 16, 96), ("nav_width", "导航宽度", 168, 320), ("table_row_height", "表格行高", 24, 64), ("draw_number_size", "开奖数字大小", 44, 120)]:
+            for key, label, low, high in [("base_size", "全局字号", 14, 24), ("title_size", "标题字号", 18, 32), ("table_size", "表格字号", 16, 20), ("number_size", "数字字号", 16, 96), ("nav_width", "导航宽度", 168, 320), ("table_row_height", "表格行高", 44, 64), ("draw_number_size", "开奖数字大小", 40, 120)]:
                 group = QSpinBox()
                 group.setRange(low, high)
                 source = "font" if key in {"base_size", "title_size", "table_size", "number_size"} else "sizes"

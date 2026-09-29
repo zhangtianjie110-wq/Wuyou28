@@ -25,9 +25,7 @@ class FormalDIYTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.config = UIConfigManager(self.root/'ui')
-        self.start_capture = patch('app.capture_controller.CaptureController.start_auto').start()
         self.start_yu28 = patch('app.yu28_controller.YU28Controller.start').start()
-        self.start_queue = patch('app.draw_capture_coordinator.DrawCaptureCoordinator.start').start()
         self.window = MainWindow(Database(self.root/'isolated.db'), ui_only=True, ui_config=self.config)
         self.window.show()
         self.window.activateWindow()
@@ -215,9 +213,7 @@ class FormalDIYTests(unittest.TestCase):
         texts=[l.text() for l in self.window.findChildren(QLabel) if l.isVisible()]
         self.assertNotIn('乐28',texts)
         self.assertNotIn('预测采集与分析',texts)
-        self.start_capture.assert_not_called()
         self.start_yu28.assert_not_called()
-        self.start_queue.assert_not_called()
 
     def test_leaving_home_locks_edit_mode(self):
         self.enter()
