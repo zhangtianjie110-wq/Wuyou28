@@ -64,11 +64,14 @@ class V2ExperimentRunner:
         config: SearchConfig | None = None,
         space: SearchSpace | None = None,
         validation_config: ValidationConfig | None = None,
+        snapshot_metadata: Mapping[str, Any] | None = None,
     ) -> V2ExperimentResult:
         active = config or SearchConfig()
         config_dict = active.to_dict()
         if validation_config is not None:
             config_dict["validation"] = validation_config.to_dict()
+        if snapshot_metadata:
+            config_dict["run_metadata"] = dict(snapshot_metadata)
         snapshot = self.snapshot_builder.build(config_dict)
         self.audit.save_snapshot(snapshot)
         run_id = self.audit.start_run(snapshot, config_dict)
@@ -176,6 +179,7 @@ class V2ExperimentRunner:
         config: SearchConfig | None = None,
         space: SearchSpace | None = None,
         validation_config: ValidationConfig | None = None,
+        snapshot_metadata: Mapping[str, Any] | None = None,
     ) -> V2ExperimentResult:
         """Explicit v2.1 entry point; defaults to the required 70/20/10 split."""
         return self.run(
@@ -183,6 +187,7 @@ class V2ExperimentRunner:
             config=config,
             space=space,
             validation_config=validation_config or ValidationConfig(),
+            snapshot_metadata=snapshot_metadata,
         )
 
 

@@ -227,6 +227,10 @@ class StrategyExperimentPage(QWidget):
         self.validation_plan = QLabel("v2.1 固定验证：训练 70% / 验证 20% / 最终测试 10%")
         self.validation_plan.setObjectName("Muted")
         controls_layout.addWidget(self.validation_plan)
+        self.v21_snapshot_label = QLabel("Snapshot: — | 数据 SHA256: — | 算法版本: — | 引擎版本: —")
+        self.v21_snapshot_label.setObjectName("Muted")
+        self.v21_snapshot_label.setWordWrap(True)
+        controls_layout.addWidget(self.v21_snapshot_label)
         root.addWidget(controls)
 
         self.notice = QLabel("等待扫描或搜索，自动搜索支持 50 / 100 / 200 个候选条件")
@@ -473,6 +477,11 @@ class StrategyExperimentPage(QWidget):
                 records,
                 config=SearchConfig(max_candidates=limit, data_source="VIP", min_sample_size=1),
                 validation_config=ValidationConfig(),
+                snapshot_metadata={
+                    "data_range": self.data_range.currentText(),
+                    "custom_start": self.custom_start.text().strip(),
+                    "custom_end": self.custom_end.text().strip(),
+                },
             )
         except Exception as exc:
             self.storage.save_gui_run({
@@ -503,13 +512,21 @@ class StrategyExperimentPage(QWidget):
         self.v21_table.setRowCount(len(result.validation))
         for row, item in enumerate(result.validation):
             robustness = result.robustness[row] if row < len(result.robustness) else None
+            if not item.train.valid_samples or not item.validation.valid_samples or not item.test.valid_samples:
+                state = "INSUFFICIENT_DATA"
+            elif item.test.hit_rate is None:
+                state = "FAIL"
+            elif robustness is not None and robustness.worst_hit_rate is not None and item.train.hit_rate is not None and robustness.worst_hit_rate < item.train.hit_rate - 20:
+                state = "WATCH"
+            else:
+                state = "PASS"
             values = (
                 item.condition_id,
                 f"{item.train.valid_samples} / {self._rate(item.train.hit_rate)}",
                 f"{item.validation.valid_samples} / {self._rate(item.validation.hit_rate)}",
                 f"{item.test.valid_samples} / {self._rate(item.test.hit_rate)}",
                 "—" if robustness is None else self._rate(robustness.worst_hit_rate),
-                "PASS" if item.validation.valid_samples else "INSUFFICIENT_DATA",
+                state,
             )
             for column, value in enumerate(values):
                 self.v21_table.setItem(row, column, QTableWidgetItem(str(value)))
@@ -518,6 +535,11 @@ class StrategyExperimentPage(QWidget):
             f"数据 SHA256: {result.snapshot.source_sha256}\n"
             f"算法版本: {result.snapshot.algorithm_version}\n"
             f"引擎版本: {result.snapshot.engine_version}"
+        )
+        self.v21_snapshot_label.setText(
+            f"实验ID: {result.run_id} | Snapshot: {result.snapshot.snapshot_id} | "
+            f"数据 SHA256: {result.snapshot.source_sha256} | "
+            f"算法版本: {result.snapshot.algorithm_version} | 引擎版本: {result.snapshot.engine_version}"
         )
 
     def run_scan_sync(self, *, limit: int = 100) -> ExperimentResult:

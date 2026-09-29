@@ -142,14 +142,14 @@ class StrategyAutoRunner:
             }
             if self.config.include_v21:
                 experiments.update(self._run_v21(records))
-            v21_status = experiments.get("v2.1", {}).get("status")
-            if v21_status and v21_status != "PASS":
-                warnings = tuple(warnings) + (f"v2.1 状态：{v21_status}",)
 
             self._log("STEP strategy_compare START")
             frozen_status = tuple(self._compare_frozen(rankings))
             self._log(f"STEP strategy_compare PASS frozen={len(frozen_status)}")
             warnings = self._warnings(data_status, pass_count, frozen_status)
+            v21_status = experiments.get("v2.1", {}).get("status")
+            if v21_status and v21_status != "PASS":
+                warnings = tuple(warnings) + (f"v2.1 状态：{v21_status}",)
             payload = {
                 "date": started.date().isoformat(),
                 "data_status": data_status,
